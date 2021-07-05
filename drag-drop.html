@@ -1,0 +1,99 @@
+<!doctype html>
+
+<head>
+    <style>
+        .moveable-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+        }
+        
+        .allow-to-move {
+            height: 100%;
+            border: 2px solid gray;
+            margin: 1rem;
+            padding: 1rem;
+        }
+        
+        .movable-b {
+            height: 6rem;
+            width: 90%;
+            margin: 1rem;
+            border: 1px solid rebeccapurple;
+        }
+        
+        .unselectable {
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<html>
+
+<body>
+    <div class="moveable-container">
+        <div class="log-container">
+            <h1>Logs -</h1>
+        </div>
+    </div>
+</body>
+
+<script>
+    (function() {
+        // Blocks
+        const blockContainers = ["Not Started", "In Progress", "On Hold", "Complteted", "Cancelled", "QA-Submit", "QA-Pass", "QA-Failed"];
+        const masterContainer = document.querySelector('.moveable-container');
+        blockContainers.forEach((textContent, index) => {
+            const innerBlock = document.createElement('div');
+            innerBlock.classList = `container-${index} allow-to-move`;
+            const headText = document.createElement('h1');
+            headText.innerText = textContent;
+            innerBlock.appendChild(headText);
+            masterContainer.appendChild(innerBlock);
+        });
+        // Create Task Block
+        const taskInitialBlock = (document.querySelector(".container-0"));
+        for (let task of[1, 2, 3, 4, 5]) {
+            const taskBlock = document.createElement('div');
+            taskBlock.classList = `b-${task} movable-b unselectable`;
+            taskBlock.innerText = `Task - ${task}`;
+            taskInitialBlock.appendChild(taskBlock);
+        }
+        // Event Handler - Drag Element in Blocks
+        let selectedItem = null;
+        const logElement = document.querySelector('.log-container');
+        const bindClickEvent = (e) => {
+            const elementAtPoint = document.elementFromPoint(e.clientX, e.clientY);
+            if (elementAtPoint.classList.value.includes('movable-b')) {
+                selectedItem = elementAtPoint;
+            }
+        }
+        const bindUpListner = (e) => {
+            if (selectedItem === null) {
+                return;
+            }
+            let containerElement = null;
+            const elementAtPoint = document.elementFromPoint(e.clientX, e.clientY);
+
+            if (elementAtPoint.classList.value.includes('allow-to-move')) {
+                containerElement = elementAtPoint;
+            } else if (elementAtPoint.parentElement.classList.value.includes('allow-to-move')) {
+                containerElement = elementAtPoint.parentElement;
+            }
+            if (containerElement) {
+                containerElement.appendChild(selectedItem);
+                const spn = document.createElement('p');
+                spn.innerHTML = `${selectedItem.innerHTML} move to ${containerElement.querySelector('h1').innerHTML}`;
+                logElement.appendChild(spn);
+                selectedItem = null;
+            }
+        }
+        document.querySelector('.moveable-container').addEventListener('mousedown', bindClickEvent);
+        document.querySelector('.moveable-container').addEventListener('mouseup', bindUpListner);
+    })();
+</script>
+
+</html>
